@@ -12,3 +12,13 @@ textarea{background:#fff!important;color:var(--text)!important}
 .chip-editor{align-items:center}.chip-editor [data-recommended]{overflow-wrap:anywhere}.chip-editor input{min-width:0}[data-plan-preview]{margin-top:18px}[data-plan-preview] .row{gap:12px;flex-wrap:wrap}
 
 .grid>*{min-width:0}.secret{overflow-wrap:anywhere;white-space:pre-wrap}.tabs{flex-wrap:wrap}.welcome .actions{flex-wrap:wrap}.migration-summary{white-space:pre-wrap;overflow-wrap:anywhere}input[type=file]{max-width:100%}button{max-width:100%} .receipt-check{display:flex;align-items:flex-start;gap:12px;margin-top:20px}
+
+/* Room-first access: two primary cards, secondary migration/recovery links. */
+.welcome .tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.welcome .tabs button{grid-column:span 2;padding:8px;font-size:11px}
+.welcome .tabs .room-choice{grid-column:span 3;min-height:86px;text-align:left;padding:14px;font-size:16px;font-weight:650;background:#fff}
+.welcome .tabs .room-choice.active{background:#fff8e7}
+.room-choice span{display:block;font-size:10px;font-weight:400;margin-top:5px;color:var(--muted)}
+.setup-options{margin:10px 0 18px}.setup-options summary{cursor:pointer;color:var(--muted);font-size:12px;margin-bottom:16px}
+.welcome .panel>h2{margin-bottom:12px}.welcome form{margin-top:14px}
+@media(max-width:420px){.room-choice span{font-size:9px}.welcome .tabs .room-choice{font-size:14px;padding:11px}.welcome .tabs button.small{font-size:10px}}

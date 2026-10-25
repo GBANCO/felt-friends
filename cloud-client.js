@@ -33,12 +33,33 @@
       const data = await checked(db.auth.getSession());
       return data.session;
     }
+    // Only explicit onboarding submissions create a device identity. Never on reads.
+    let anonymousPending = null;
+    async function ensureDeviceSession() {
+      if (anonymousPending) return anonymousPending;
+      anonymousPending = (async () => {
+        const existing = await session();
+        if (existing) return existing; // Retain existing anonymous AND email sessions.
+        try {
+          const data = await checked(db.auth.signInAnonymously());
+          if (!data?.session) throw Error('Device sign-in did not return a session. Please try again.');
+          return data.session;
+        } catch (error) {
+          if (error.code === 'anonymous_provider_disabled' || /anonymous.*(disabled|not enabled|not allowed)/i.test(error.message)) {
+            throw Error('Host must enable Anonymous Sign-Ins in Supabase Authentication settings. Nothing was added to the ledger.');
+          }
+          throw error;
+        }
+      })();
+      try { return await anonymousPending; } finally { anonymousPending = null; }
+    }
     async function api(path, payload) {
       path = path.replace(/^\/api\//, '');
       if (path === 'logout') { await checked(db.auth.signOut()); selectGroup(null); return { ok: true }; }
+      if (['setup', 'join', 'import', 'claim', 'recover'].includes(path)) await ensureDeviceSession();
       if (!await session()) {
         if (path === 'state') return { me: null, group: null, players: [], sessions: [], auth_required: true };
-        throw Error('Sign in with email before creating or joining a group');
+        throw Error('Create or join a room on this device first.');
       }
       const data = path === 'state'
         ? await checked(db.rpc('felt_state', { p_group_id: groupId }))
